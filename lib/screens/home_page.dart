@@ -35,7 +35,10 @@ class _HomePageState extends State<HomePage> {
       body: FutureBuilder(
           future: fetchData(),
           builder: (context, snapshot) {
-            final campaigns = snapshot.data["campaigns"] as List<dynamic>;
+            var campaigns = [];
+            if (snapshot.data != null) {
+            campaigns = snapshot.data["campaigns"] as List<dynamic>;
+            }
 
             Widget campaignsWidgets = Column(
               children: [

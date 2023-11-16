@@ -69,108 +69,111 @@ class _CampaignCreatePageState extends State<CampaignCreatePage> {
 
   Widget view() {
     return Scaffold(
-      body: FutureBuilder(
-          future: fetchLoginType(),
-          builder: (context, snapshot) {
-            return SafeArea(
-                child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  padding:
-                      EdgeInsets.only(top: 15, bottom: 15, left: 30, right: 30),
-                  child: Column(children: [
-                    SizedBox(
-                      height: 20,
-                    ),
-                    this.TextFieldInput(
-                        label: "Campaign",
-                        hintText: "Ex: Appname, website",
-                        focusNode: myFocusNode,
-                        controller: titleController),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    this.TextFieldInput(
-                      label: "Expected & Date",
-                      keyboardType: TextInputType.datetime,
-                      controller: dateController,
-                      onTap: () async {
-                        final picker = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime(2000),
-                          lastDate: DateTime(2025),
-                          onDatePickerModeChange: (value) {},
-                        );
-
-                        dateController.text = picker!.day.toString() +
-                            '/' +
-                            picker!.month.toString() +
-                            '/' +
-                            picker!.year.toString();
-                      },
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    this.TextFieldInput(
-                        label: "Target Total Earning",
-                        hintText: "Ex: \$10,000",
-                        controller: totalEarningController,
-                        keyboardType: TextInputType.number),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    this.TextFieldInput(
-                        label: "Target Total Impression",
-                        hintText: "Ex: 10,000",
-                        controller: totalImpressionController,
-                        keyboardType: TextInputType.number),
-                    SizedBox(
-                      height: 15,
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(
-                          "eCPM = " + eCPM,
+        resizeToAvoidBottomInset: false,
+        body: SingleChildScrollView(
+          child: FutureBuilder(
+              future: fetchLoginType(),
+              builder: (context, snapshot) {
+                return SafeArea(
+                    child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      padding: EdgeInsets.only(
+                          top: 15, bottom: 15, left: 30, right: 30),
+                      child: Column(children: [
+                        SizedBox(
+                          height: 20,
                         ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 35,
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        ElevatedButton(
-                          child: Text(
-                            "Save",
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
-                            shadowColor: Colors.transparent,
-                            padding: const EdgeInsets.fromLTRB(0, 15, 0, 15),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                              // side: BorderSide(color: Colors.red)
+                        this.TextFieldInput(
+                            label: "Campaign",
+                            hintText: "Ex: Appname, website",
+                            focusNode: myFocusNode,
+                            controller: titleController),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        this.TextFieldInput(
+                          label: "Expected & Date",
+                          keyboardType: TextInputType.datetime,
+                          controller: dateController,
+                          onTap: () async {
+                            final picker = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(2000),
+                              lastDate: DateTime(2025),
+                              onDatePickerModeChange: (value) {},
+                            );
+
+                            dateController.text = picker!.day.toString() +
+                                '/' +
+                                picker!.month.toString() +
+                                '/' +
+                                picker!.year.toString();
+                          },
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        this.TextFieldInput(
+                            label: "Target Total Earning",
+                            hintText: "Ex: \$10,000",
+                            controller: totalEarningController,
+                            keyboardType: TextInputType.number),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        this.TextFieldInput(
+                            label: "Target Total Impression",
+                            hintText: "Ex: 10,000",
+                            controller: totalImpressionController,
+                            keyboardType: TextInputType.number),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              "eCPM = " + eCPM,
                             ),
-                          ),
-                          onPressed: saveData,
+                          ],
+                        ),
+                        SizedBox(
+                          height: 35,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            ElevatedButton(
+                              child: Text(
+                                "Save",
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue,
+                                shadowColor: Colors.transparent,
+                                padding:
+                                    const EdgeInsets.fromLTRB(0, 15, 0, 15),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  // side: BorderSide(color: Colors.red)
+                                ),
+                              ),
+                              onPressed: saveData,
+                            )
+                          ],
                         )
-                      ],
-                    )
-                  ]),
-                ),
-              ],
-            ));
-          }),
-      // #242527
-    );
+                      ]),
+                    ),
+                  ],
+                ));
+              }),
+          // #242527
+        ));
   }
 
   geteCPM() {
@@ -248,7 +251,7 @@ class _CampaignCreatePageState extends State<CampaignCreatePage> {
           keyboardType: keyboardType,
           controller: controller,
           inputFormatters: inputFormatters,
-          onTap: onTap,
+          // onTap: onTap,
           focusNode: focusNode,
           decoration: InputDecoration(
               border: OutlineInputBorder(
