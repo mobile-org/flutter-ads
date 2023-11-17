@@ -98,6 +98,7 @@ class _CampaignCreatePageState extends State<CampaignCreatePage> {
                           label: "Expected & Date",
                           keyboardType: TextInputType.datetime,
                           controller: dateController,
+                          suffixIcon: Icon(Icons.date_range),
                           onTap: () async {
                             final picker = await showDatePicker(
                               context: context,
@@ -224,6 +225,7 @@ class _CampaignCreatePageState extends State<CampaignCreatePage> {
       String hintText = "",
       TextEditingController? controller,
       FocusNode? focusNode,
+      Widget? suffixIcon,
       void Function()? onTap}) {
     List<TextInputFormatter> inputFormatters = [];
 
@@ -251,7 +253,7 @@ class _CampaignCreatePageState extends State<CampaignCreatePage> {
           keyboardType: keyboardType,
           controller: controller,
           inputFormatters: inputFormatters,
-          // onTap: onTap,
+          onTap: onTap,
           focusNode: focusNode,
           decoration: InputDecoration(
               border: OutlineInputBorder(
@@ -259,6 +261,7 @@ class _CampaignCreatePageState extends State<CampaignCreatePage> {
                   borderSide: BorderSide.none),
               hintText: hintText,
               filled: true,
+              suffixIcon: suffixIcon,
               fillColor: Color(0xffE6E6E6)),
         ),
       ],

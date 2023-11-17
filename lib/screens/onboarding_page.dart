@@ -150,7 +150,7 @@ class _OnboardingState extends State<Onboarding> {
                           onPressed: () async {
                             var loginType =
                                 await storage.read(key: "login_type");
-                            if (loginType == "2") {
+                            if (loginType == "1") {
                               Navigator.pushNamed(
                                   context, HomeLayout.routeName);
                             } else {

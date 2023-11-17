@@ -1,11 +1,13 @@
 import 'dart:convert';
 
+import 'package:ads/screens/campaign_create_page.dart';
 import 'package:ads/screens/login_page.dart';
 import 'package:ads/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:ads/screens/webview.dart';
 import 'package:ads/services/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_dash/flutter_dash.dart';
 
 const storage = FlutterSecureStorage();
 
@@ -32,22 +34,135 @@ class _HomePageState extends State<HomePage> {
 
   Widget view() {
     return Scaffold(
-      body: FutureBuilder(
+        body: SingleChildScrollView(
+      child: FutureBuilder(
           future: fetchData(),
           builder: (context, snapshot) {
             var campaigns = [];
             if (snapshot.data != null) {
-            campaigns = snapshot.data["campaigns"] as List<dynamic>;
+              campaigns = snapshot.data["campaigns"] as List<dynamic>;
             }
 
-            Widget campaignsWidgets = Column(
-              children: [
-                ...campaigns.map((campaign) {
-                  return Row(
-                    children: [Text(campaign["title"])],
-                  );
-                })
-              ],
+            Widget campaignsWidgets = Padding(
+              padding: EdgeInsets.only(left: 15, right: 15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ...campaigns.map((campaign) {
+                    return GestureDetector(
+                      onTap: () {
+                        Utils.mainListNav.currentState?.pushNamed(CampaignCreatePage.routeName);
+                      },
+                      child: Row(
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width - 30,
+                          margin: EdgeInsets.only(bottom: 10),
+                          padding: EdgeInsets.all(15),
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.blue),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(16))),
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  campaign["title"],
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                      color: Colors.blue),
+                                ),
+                                Text(
+                                  "End date: " + campaign["date"],
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                IntrinsicHeight(
+                                  child: Row(
+                                    children: [
+                                      new Expanded(
+                                        flex: 1,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            new Text(
+                                              "Reality",
+                                              style: TextStyle(
+                                                  color: Colors.grey,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                             SizedBox(height: 10,),
+                                            new Text(
+                                              "Earning: 0",
+                                              style: TextStyle(
+                                                fontSize: 12
+                                                  ),
+                                            ),
+                                            new Text(
+                                              "Impression: 0",
+                                             style: TextStyle(
+                                                fontSize: 12
+                                                  ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                            left: 15, right: 15),
+                                        child: Dash(
+                                            direction: Axis.vertical,
+                                            dashLength: 2,
+
+                                            length: 70,
+                                            dashColor: Colors.grey),
+                                      ),
+                                      new Expanded(
+                                        flex: 1,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            new Text(
+                                              "Target",
+                                              style: TextStyle(
+                                                  color: Colors.grey,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            SizedBox(height: 10,),
+                                            new Text(
+                                              "Earning: " + campaign["total_earning"],
+                                              style: TextStyle(
+                                                fontSize: 12
+                                                  ),
+                                            ),
+                                            new Text(
+                                              "Impression: " + campaign["total_impression"],
+                                             style: TextStyle(
+                                                fontSize: 12
+                                                  ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              ]),
+                        ),
+                      ],
+                    ));
+                  })
+                ],
+              ),
             );
 
             return SafeArea(
@@ -123,7 +238,7 @@ class _HomePageState extends State<HomePage> {
             ));
           }),
       // #242527
-    );
+    ));
   }
 
   @override

