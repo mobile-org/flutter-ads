@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ads/screens/webview.dart';
 import 'package:ads/services/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:go_router/go_router.dart';
 
 const storage = FlutterSecureStorage();
 
@@ -125,7 +126,7 @@ class _LoginPageState extends State<LoginPage> {
           ? null
           : () async {
               await Service.trackingLoginFacebook();
-              Navigator.pushNamed(context, Webview.routeName);
+              context.goNamed("webview");
             },
       child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
         Image(width: 20, image: AssetImage(icon)),
@@ -158,7 +159,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   loginWithFacebook() async {
-    Navigator.pushNamed(context, Webview.routeName);
+    GoRouter.of(context).pushNamed("webview");
     await Service.trackingLoginFacebook();
   }
 

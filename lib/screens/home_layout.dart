@@ -1,11 +1,15 @@
+// ignore_for_file: prefer_const_constructors, unnecessary_new, prefer_interpolation_to_compose_strings, sort_child_properties_last, prefer_const_literals_to_create_immutables, prefer_is_empty, library_private_types_in_public_api
+
 import 'dart:math';
 
 import 'package:ads/screens/campaign_create_page.dart';
+import 'package:ads/screens/campaign_detail.dart';
 import 'package:ads/screens/home_page.dart';
 import 'package:ads/screens/settings_page.dart';
 import 'package:ads/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:go_router/go_router.dart';
 
 const storage = FlutterSecureStorage();
 
@@ -112,12 +116,15 @@ class _OnboardingState extends State<HomeLayout> {
               setState(() {
                 _appTitle = "Business Manager";
               });
-              Utils.mainListNav.currentState?.pushNamed(HomePage.routeName);
+              GoRouter.of(context).goNamed("home");
+              // Utils.mainListNav.currentState?.pushNamed(HomePage.routeName);
             } else if (value == 1) {
-              Utils.mainListNav.currentState
-                  ?.pushNamed(CampaignCreatePage.routeName);
+              GoRouter.of(context).pushNamed("home");
+              // Utils.mainListNav.currentState
+              //     ?.pushNamed(CampaignCreatePage.routeName);
             } else if (value == 2) {
-              Utils.mainListNav.currentState?.pushNamed(SettingPage.routeName);
+              GoRouter.of(context).goNamed("settings");
+              // Utils.mainListNav.currentState?.pushNamed(SettingPage.routeName);
             }
 
             // setState(() {
@@ -150,6 +157,8 @@ class _OnboardingState extends State<HomeLayout> {
                   appTitle = "Settings";
                 } else if (settings.name == CampaignCreatePage.routeName) {
                   appTitle = "Create Campaign";
+                } else if (settings.name == CampaignDetail.routeName) {
+                  appTitle ="Campaign Detail";
                 }
                 setState(() {
                   _currentRoute = settings.name;
@@ -158,12 +167,14 @@ class _OnboardingState extends State<HomeLayout> {
               }
 
               switch (settings.name) {
-                case '/':
+                case HomePage.routeName:
                   page = HomePage();
                   break;
                 case SettingPage.routeName:
                   page = SettingPage();
                   break;
+                case CampaignDetail.routeName:
+                  page = CampaignDetail();
                 default:
                   page = CampaignCreatePage();
                   break;

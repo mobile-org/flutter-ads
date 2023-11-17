@@ -1,7 +1,11 @@
 import 'dart:math';
 
+import 'package:ads/screens/campaign_create_page.dart';
+import 'package:ads/screens/campaign_detail.dart';
 import 'package:ads/screens/home_layout.dart';
+import 'package:ads/screens/home_page.dart';
 import 'package:ads/screens/login_page.dart';
+import 'package:ads/screens/settings_page.dart';
 import 'package:ads/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -11,6 +15,8 @@ import 'package:ads/screens/webview.dart';
 import 'package:ads/services/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
+
+import 'package:go_router/go_router.dart';
 
 const storage = FlutterSecureStorage();
 Future main() async {
@@ -28,6 +34,158 @@ class Storage {
   });
 }
 
+final _parentKey = GlobalKey<NavigatorState>();
+final _shellKey = GlobalKey<NavigatorState>();
+
+final GoRouter _router = GoRouter(
+  routes: [
+    GoRoute(
+      // parentNavigatorKey: _parentKey,
+      name: "onboarding",
+      path: "/",
+      builder: (context, state) => const Onboarding(),
+    ),
+    GoRoute(
+      // parentNavigatorKey: _parentKey,
+      name: "webview",
+      path: "/webview",
+      builder: (context, state) => Webview(),
+    ),
+    GoRoute(
+      // parentNavigatorKey: _parentKey,
+      name: "login",
+      path: "/login",
+      builder: (context, state) => LoginPage(),
+    ),
+    ShellRoute(
+        navigatorKey: _shellKey,
+        // navigatorKey: _parentKey,
+        builder: (BuildContext context, GoRouterState state, Widget child) {
+          return Scaffold(
+            appBar: AppBar(
+                title: const Text('Ads Manager'),
+                centerTitle: true,
+                automaticallyImplyLeading: state.fullPath == "/home" ? true : false,
+                shadowColor: Colors.transparent,
+                actions: [
+                  state.name == "home" ? Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        child: GestureDetector(
+                          onTap: () {
+                            GoRouter.of(context).pushNamed("create-campaign");
+                          },
+                          child: Ink(
+                              decoration: ShapeDecoration(
+                                color: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.circular(8), // <-- Radius
+                                ),
+                              ),
+                              child: Icon(
+                                Icons.add,
+                                size: 30,
+                                color: Colors.blue,
+                              )),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 20,
+                      )
+                    ],
+                  ): SizedBox(),
+                ]),
+            bottomNavigationBar: Container(
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border(
+                        top: BorderSide(
+                            color: const Color.fromARGB(255, 199, 196, 196),
+                            width: 1.0))),
+                child: BottomNavigationBar(
+                  showSelectedLabels: false,
+                  showUnselectedLabels: false,
+
+                  items: <BottomNavigationBarItem>[
+                    BottomNavigationBarItem(
+                        icon: Image.asset(
+                          "assets/icons/home.png",
+                          width: 25,
+                        ),
+                        label: ""),
+                    BottomNavigationBarItem(
+                        icon: Image.asset(
+                          "assets/icons/graphic.png",
+                          width: 25,
+                        ),
+                        label: ""),
+                    BottomNavigationBarItem(
+                        icon: Image.asset(
+                          "assets/icons/settings.png",
+                          width: 25,
+                        ),
+                        label: ""),
+                  ],
+                  currentIndex: 0,
+                  selectedItemColor: Colors.amber[800],
+                  onTap: (value) {
+                    if (value == 0) {
+                      GoRouter.of(context).goNamed("home");
+                      // Utils.mainListNav.currentState?.pushNamed(HomePage.routeName);
+                    } else if (value == 1) {
+                      GoRouter.of(context).pushNamed("home");
+                      // Utils.mainListNav.currentState
+                      //     ?.pushNamed(CampaignCreatePage.routeName);
+                    } else if (value == 2) {
+                      GoRouter.of(context).pushNamed("settings");
+                      // Utils.mainListNav.currentState?.pushNamed(SettingPage.routeName);
+                    }
+
+                    // setState(() {
+                    //   _itemSelected = value;
+                    // })
+                  },
+                  // onTap: (value) {
+                  //   if (value == "1") {
+                  //     Navigator.pushNamed(context, CampaignCreatePage.routeName);
+                  //   }
+                  // },
+                )),
+            body: child,
+          );
+        },
+        routes: [
+          GoRoute(
+            // parentNavigatorKey: _shellKey,
+            name: "home",
+            path: "/home",
+            builder: (context, state) => HomePage(),
+          ),
+          GoRoute(
+            // parentNavigatorKey: _shellKey,
+            name: "settings",
+            path: "/settings",
+            builder: (context, state) => SettingPage(),
+          ),
+          GoRoute(
+            // parentNavigatorKey: _shellKey,
+            name: "create-campaign",
+            path: "/create-campaign",
+            builder: (context, state) => CampaignCreatePage(),
+          ),
+          GoRoute(
+            // parentNavigatorKey: _shellKey,
+            name: "detail-campaign",
+            path: "/detail-campaign",
+            builder: (context, state) => CampaignDetail(),
+          ),
+        ]),
+  ],
+);
+
 class MyApp extends StatelessWidget {
   const MyApp() : super();
 
@@ -36,20 +194,9 @@ class MyApp extends StatelessWidget {
     return FutureBuilder(
         future: loadData(),
         builder: (BuildContext context, AsyncSnapshot<Storage> snapshot) {
-          String initialRoute = Initialize.routeName;
-
-          return MaterialApp(
-            navigatorKey: Utils.mainAppNav,
-            // key: Utils.mainAppNav,
-            routes: <String, WidgetBuilder>{
-              Initialize.routeName: (context) => const Initialize(),
-              Onboarding.routeName: (context) => const Onboarding(),
-              LoginPage.routeName: (context) => const LoginPage(),
-              HomeLayout.routeName: (context) => const HomeLayout(),
-              Webview.routeName: (context) =>
-                  Webview(nextUrl: snapshot.data!.f2!),
-            },
-            initialRoute: initialRoute,
+          return MaterialApp.router(
+            routerConfig: _router,
+            title: "Ads manager",
           );
         });
   }

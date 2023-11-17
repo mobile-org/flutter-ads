@@ -2,6 +2,8 @@ import 'package:ads/screens/home_layout.dart';
 import 'package:ads/screens/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:go_router/go_router.dart';
 
 const storage = FlutterSecureStorage();
 
@@ -150,11 +152,12 @@ class _OnboardingState extends State<Onboarding> {
                           onPressed: () async {
                             var loginType =
                                 await storage.read(key: "login_type");
-                            if (loginType == "1") {
-                              Navigator.pushNamed(
-                                  context, HomeLayout.routeName);
+                                print(loginType);
+                                print(dotenv.env['LOGIN_REQUIRED']);
+                            if (loginType == dotenv.env['LOGIN_REQUIRED']) {
+                              GoRouter.of(context).pushNamed("login");
                             } else {
-                              Navigator.pushNamed(context, LoginPage.routeName);
+                              GoRouter.of(context).goNamed("home");
                             }
                           },
                           child: const Text('Continue',
