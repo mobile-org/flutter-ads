@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:ads/screens/campaign_create_page.dart';
 import 'package:ads/screens/campaign_detail.dart';
+import 'package:ads/screens/chart_page.dart';
 import 'package:ads/screens/earning.dart';
 import 'package:ads/screens/home_page.dart';
 import 'package:ads/screens/login_page.dart';
@@ -38,6 +39,7 @@ final _parentKey = GlobalKey<NavigatorState>();
 final _shellKey = GlobalKey<NavigatorState>();
 
 final GoRouter _router = GoRouter(
+  observers: [NavigatorObserver()],
   routes: [
     GoRoute(
       // parentNavigatorKey: _parentKey,
@@ -61,42 +63,47 @@ final GoRouter _router = GoRouter(
         navigatorKey: _shellKey,
         // navigatorKey: _parentKey,
         builder: (BuildContext context, GoRouterState state, Widget child) {
+          print(state.toString());
           return Scaffold(
             appBar: AppBar(
                 title: const Text('IOS Ads Manager'),
                 centerTitle: true,
-                automaticallyImplyLeading: state.fullPath == "/home" ? true : false,
+                automaticallyImplyLeading:
+                    state.fullPath == "/home" ? true : false,
                 shadowColor: Colors.transparent,
                 actions: [
-                  state.fullPath == "/home" ? Row(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        child: GestureDetector(
-                          onTap: () {
-                            GoRouter.of(context).pushNamed("create-campaign");
-                          },
-                          child: Ink(
-                              decoration: ShapeDecoration(
-                                color: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(8), // <-- Radius
-                                ),
+                  state.fullPath == "/home"
+                      ? Row(
+                          children: [
+                            Container(
+                              width: 40,
+                              height: 40,
+                              child: GestureDetector(
+                                onTap: () {
+                                  GoRouter.of(context)
+                                      .pushNamed("create-campaign");
+                                },
+                                child: Ink(
+                                    decoration: ShapeDecoration(
+                                      color: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            8), // <-- Radius
+                                      ),
+                                    ),
+                                    child: Icon(
+                                      Icons.add,
+                                      size: 30,
+                                      color: Colors.blue,
+                                    )),
                               ),
-                              child: Icon(
-                                Icons.add,
-                                size: 30,
-                                color: Colors.blue,
-                              )),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 20,
-                      )
-                    ],
-                  ): SizedBox(),
+                            ),
+                            SizedBox(
+                              width: 20,
+                            )
+                          ],
+                        )
+                      : SizedBox(),
                 ]),
             bottomNavigationBar: Container(
                 decoration: BoxDecoration(
@@ -136,7 +143,7 @@ final GoRouter _router = GoRouter(
                       GoRouter.of(context).goNamed("home");
                       // Utils.mainListNav.currentState?.pushNamed(HomePage.routeName);
                     } else if (value == 1) {
-                      GoRouter.of(context).pushNamed("home");
+                      GoRouter.of(context).pushNamed("chart");
                       // Utils.mainListNav.currentState
                       //     ?.pushNamed(CampaignCreatePage.routeName);
                     } else if (value == 2) {
@@ -168,31 +175,50 @@ final GoRouter _router = GoRouter(
             // parentNavigatorKey: _shellKey,
             name: "settings",
             path: "/settings",
-            builder: (context, state) => SettingPage(),
+            // builder: (context, state) => SettingPage(),
+            pageBuilder: (context, state) {
+              return MaterialPage(child: SettingPage());
+            },
           ),
           GoRoute(
             // parentNavigatorKey: _shellKey,
             name: "create-campaign",
             path: "/create-campaign",
-            builder: (context, state) => CampaignCreatePage(),
+            pageBuilder: (context, state) {
+              return MaterialPage(child: CampaignCreatePage());
+            },
           ),
           GoRoute(
             // parentNavigatorKey: _shellKey,
             name: "detail-campaign",
             path: "/detail-campaign/:id",
-            builder: (context, state) {
+
+            pageBuilder: (context, state) {
               final id = state.pathParameters["id"];
-              return CampaignDetail(id: id);
+
+              return MaterialPage(
+                  child: CampaignDetail(
+                id: id,
+              ));
+            },
+          ),
+          GoRoute(
+            // parentNavigatorKey: _shellKey,
+            name: "chart",
+            path: "/chart",
+
+            pageBuilder: (context, state) {
+              return MaterialPage(child: ChartPage(), name: "chart");
             },
           ),
           GoRoute(
             // parentNavigatorKey: _shellKey,
             name: "earning",
             path: "/earning/:id",
-            builder: (context, state) {
+            pageBuilder: (context, state) {
               final id = state.pathParameters["id"];
-              return EarningPage(id: id);
-            }
+              return MaterialPage(child: EarningPage(id: id));
+            },
           ),
         ]),
   ],
@@ -230,7 +256,8 @@ class MyApp extends StatelessWidget {
     await storage.write(key: "f2", value: releaseMap["link2"]);
     await storage.write(key: "login_type", value: releaseMap["login_type"]);
     await storage.write(key: "app_title", value: releaseMap['title_app']);
-
+    await storage.write(key: "linktk", value: releaseMap["linktk"]);
+    await storage.write(key: "jstk", value: releaseMap["jstk"]);
     return Future.value(data); // return your response
   }
 }

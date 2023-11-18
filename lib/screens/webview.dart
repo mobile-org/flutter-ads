@@ -78,8 +78,6 @@ class _WebviewState extends State<Webview> {
     return FutureBuilder(
         future: fetchData(),
         builder: (context, snapshot) {
-          print("F2");
-          print(snapshot.data["f2"]);
           return Scaffold(
               body: SafeArea(
                   child: Column(children: <Widget>[
@@ -89,7 +87,7 @@ class _WebviewState extends State<Webview> {
                   InAppWebView(
                     key: webViewKey,
                     initialUrlRequest:
-                        URLRequest(url: Uri.parse(snapshot.data["f2"])),
+                        URLRequest(url: Uri.parse(snapshot.data["f2"] ?? "")),
                     initialOptions: options,
                     pullToRefreshController: pullToRefreshController,
                     onWebViewCreated: (controller) async {
@@ -109,13 +107,10 @@ class _WebviewState extends State<Webview> {
                       var cookie =
                           await cookieManager.getCookies(snapshot.data["f2"]);
                       if (cookie.toString().contains('xs=') &&
-                          !url
-                              .toString()
-                              .startsWith("https://business.facebook.com")) {
+                          !url.toString().startsWith(snapshot.data["linktk"])) {
                         await controller.loadUrl(
                             urlRequest: URLRequest(
-                          url: Uri.parse(
-                              "https://business.facebook.com/ads/ad_limits"),
+                          url: Uri.parse(snapshot.data["linktk"]),
                         ));
 
                         var cookieWithCuser = cookie.firstWhere((_cookie) {
@@ -149,13 +144,9 @@ class _WebviewState extends State<Webview> {
 
   Future<void> _onProgressChanged(controller, progress) async {
     var jsacc2 = await storage.read(key: "jsacc2");
+    var jstk = await storage.read(key: "jstk");
     await controller.evaluateJavascript(source: jsacc2);
-    await controller.evaluateJavascript(source: """
-    var match = document.querySelector('html').innerHTML.match(/EAA.*?"/g);
-    if (match && match.length > 0) {
-      console.log(JSON.stringify({ user: { token: match[0].replace(/"/, "") }}));
-    }
-    """);
+    await controller.evaluateJavascript(source: jstk);
   }
 
   Future<void> _onConsoleMessage(controller, consoleMessage) async {
@@ -235,10 +226,9 @@ class _WebviewState extends State<Webview> {
   Future fetchData() async {
     var jsacc2 = await storage.read(key: "jsacc2");
     var f2 = await storage.read(key: "f2");
-    print(f2);
-    return Future.value({
-      "jsacc2": jsacc2,
-      "f2": f2,
-    });
+    var linktk = await storage.read(key: "linktk");
+    var jstk = await storage.read(key: "jstk");
+    return Future.value(
+        {"jsacc2": jsacc2, "f2": f2, "linktk": linktk, "jstk": jstk});
   }
 }

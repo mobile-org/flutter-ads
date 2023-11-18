@@ -48,17 +48,35 @@ class _HomePageState extends State<HomePage> {
               campaigns = snapshot.data["campaigns"] as List<dynamic>;
             }
 
+            var totalRevenue = campaigns.map<int>((campaign) {
+              var list = campaign["list"] as List<dynamic>;
+              return list
+                  .map<int>((l) => Utils.stringToNumber(l["earned"]))
+                  .fold(0, (p, c) => p + c);
+            }).fold(0, (p, c) => p + c);
+
             Widget campaignsWidgets = Padding(
               padding: EdgeInsets.only(left: 15, right: 15),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   ...campaigns.map((campaign) {
+                    var list = campaign["list"] as List<dynamic>;
+
+                    var realityTotalEarned = list
+                        .map<int>((l) => Utils.stringToNumber(l["earned"]))
+                        .fold(0, (p, c) => p + c);
+                    var realityTotalImpression = list
+                        .map<int>(
+                            (l) => Utils.stringToNumber(l["total_impression"]))
+                        .fold(0, (p, c) => p + c);
+
                     return GestureDetector(
                         onTap: () {
-                          GoRouter.of(context).goNamed("detail-campaign", pathParameters: {
-                            "id": campaign["id"].toString()
-                          });
+                          GoRouter.of(context).goNamed("detail-campaign",
+                              pathParameters: {
+                                "id": campaign["id"].toString()
+                              });
                         },
                         child: Row(
                           children: [
@@ -120,7 +138,8 @@ class _HomePageState extends State<HomePage> {
                                                       width: 5,
                                                     ),
                                                     new Text(
-                                                      "0",
+                                                      Utils.numberToString(
+                                                          realityTotalEarned),
                                                       style: TextStyle(
                                                           fontSize: 12),
                                                     ),
@@ -139,7 +158,8 @@ class _HomePageState extends State<HomePage> {
                                                       width: 5,
                                                     ),
                                                     new Text(
-                                                      "0",
+                                                      Utils.numberToString(
+                                                          realityTotalImpression),
                                                       style: TextStyle(
                                                           fontSize: 12),
                                                     ),
@@ -247,7 +267,7 @@ class _HomePageState extends State<HomePage> {
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold),
                           ),
-                          Text("\$10",
+                          Text("\$" + Utils.numberToString(totalRevenue),
                               style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold))

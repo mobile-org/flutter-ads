@@ -32,7 +32,11 @@ class _CampaignCreatePageState extends State<CampaignCreatePage> {
   @override
   void initState() {
     var now = new DateTime.now();
-    final dateNow = now.day.toString() + "/" + now.month.toString() + "/" + now.year.toString();
+    final dateNow = now.day.toString() +
+        "/" +
+        now.month.toString() +
+        "/" +
+        now.year.toString();
     dateController.text = dateNow;
     super.initState();
     totalEarningController.addListener(() {
@@ -185,6 +189,10 @@ class _CampaignCreatePageState extends State<CampaignCreatePage> {
         totalEarningController.text == "" ||
         totalImpressionController.text == "" ||
         dateController.text == "") {
+      return;
+    }
+
+    if (!Utils.isDate(dateController.text, "dd/MM/yyyy")) {
       return;
     }
     var campaignsStr = await storage.read(key: "campaigns");

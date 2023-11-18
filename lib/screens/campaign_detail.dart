@@ -41,6 +41,25 @@ class _CampaignDetailState extends State<CampaignDetail> {
             if (snapshot.data != null) {
               campaign = snapshot.data["campaign"];
             }
+
+            var list = campaign["list"] as List<dynamic>;
+
+            var totalEarned = list
+                .map<int>((l) => Utils.stringToNumber(l["earned"]))
+                .fold(0, (p, c) => p + c);
+
+            var totalImpression = list
+                .map<int>((l) => Utils.stringToNumber(l["total_impression"]))
+                .fold(0, (p, c) => p + c);
+
+            var realityECPM = Utils.geteCPM(totalEarned, totalImpression);
+            var targetECPM = Utils.geteCPM(
+                Utils.stringToNumber(campaign["total_earning"]),
+                Utils.stringToNumber(campaign["total_impression"]));
+            print(totalEarned);
+
+            print(campaign["list"]);
+
             Widget campaignsWidgets = Container(
                 padding:
                     EdgeInsets.only(left: 15, right: 15, top: 15, bottom: 15),
@@ -77,7 +96,7 @@ class _CampaignDetailState extends State<CampaignDetail> {
                                   width: 5,
                                 ),
                                 new Text(
-                                  "0",
+                                  Utils.numberToString(totalEarned),
                                   style: TextStyle(fontSize: 12),
                                 ),
                               ],
@@ -95,7 +114,7 @@ class _CampaignDetailState extends State<CampaignDetail> {
                                   width: 5,
                                 ),
                                 new Text(
-                                  "0",
+                                  Utils.numberToString(totalImpression),
                                   style: TextStyle(fontSize: 12),
                                 ),
                               ],
@@ -110,7 +129,7 @@ class _CampaignDetailState extends State<CampaignDetail> {
                                   width: 4,
                                 ),
                                 new Text(
-                                  "0",
+                                  realityECPM.toString(),
                                   style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold),
@@ -185,7 +204,7 @@ class _CampaignDetailState extends State<CampaignDetail> {
                                   width: 4,
                                 ),
                                 new Text(
-                                  "0",
+                                  targetECPM.toString(),
                                   style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold),
@@ -262,7 +281,8 @@ class _CampaignDetailState extends State<CampaignDetail> {
         TableCell(
             child: Container(
           padding: EdgeInsets.only(bottom: 15),
-          child: Text(geteCPM(l["earned"], l["total_impression"]), style: TextStyle(fontSize: 12)),
+          child: Text(geteCPM(l["earned"], l["total_impression"]),
+              style: TextStyle(fontSize: 12)),
         )),
         TableCell(
             child: Container(

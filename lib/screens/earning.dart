@@ -158,6 +158,9 @@ class _EarningPageState extends State<EarningPage> {
         dateController.text == "") {
       return;
     }
+    if (!Utils.isDate(dateController.text, "dd/MM/yyyy")) {
+      return;
+    }
     var campaignsStr = await storage.read(key: "campaigns");
 
     final campaigns =

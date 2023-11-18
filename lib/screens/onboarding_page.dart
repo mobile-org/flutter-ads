@@ -22,6 +22,13 @@ class _OnboardingState extends State<Onboarding> {
   var onboardIndex = 0;
   var loginType = 2; // Don't show webview
   var isLoaded = false;
+  Map<String, bool> checkbox = {
+    "a": false,
+    "b": false,
+    "c": false,
+    "d": false,
+  };
+
   @override
   void initState() {
     super.initState();
@@ -30,21 +37,25 @@ class _OnboardingState extends State<Onboarding> {
   Widget view() {
     final List texts = [
       {
+        "name": "a",
         "title": "Capaign updates",
         "description":
             "The status of your campaigns: approval, ending and perfirmance."
       },
       {
+        "name": "b",
         "title": "Alerts",
         "description":
             "Errors blocking your campaigns: ad rejection, billing issues, or reaching your spending limit."
       },
       {
+        "name": "c",
         "title": "Best for beginners",
         "description":
             "Essential notifications for those starting out on Ads Manager."
       },
       {
+        "name": "d",
         "title": "Performance opportunities",
         "description": "Suggestions to improve campaign performanca."
       }
@@ -56,7 +67,7 @@ class _OnboardingState extends State<Onboarding> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Checkbox(
-                  value: true,
+                  value: checkbox[text["name"]],
                   checkColor: Colors.blue,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(1.0),
@@ -66,7 +77,11 @@ class _OnboardingState extends State<Onboarding> {
                         width: 1.0, color: Color(0xffaaaaaa), strokeAlign: 3),
                   ),
                   activeColor: Colors.transparent,
-                  onChanged: (value) => {},
+                  onChanged: (value) {
+                    setState(() {
+                      checkbox[text["name"]] = value!;
+                    });
+                  },
                 ),
                 Container(
                   padding: EdgeInsets.only(bottom: 0),
@@ -103,17 +118,25 @@ class _OnboardingState extends State<Onboarding> {
                 const SizedBox(
                   height: 30,
                 ),
-                const Stack(
-                  children: [
-                    Text(
-                      "Turn on push notifications to stay updated",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ],
+                Container(
+                  child: Image.asset(
+                    "assets/logo.png",
+                    width: 120,
+                  ),
+                ),
+                const SizedBox(
+                  height: 30,
+                ),
+                Container(
+                  padding: EdgeInsets.only(left: 15, right: 15),
+                  child: Text(
+                    "Turn on push notifications to stay updated",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold),
+                  ),
                 ),
                 const SizedBox(
                   height: 30,
@@ -140,7 +163,7 @@ class _OnboardingState extends State<Onboarding> {
                         ),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xff1a78f4),
+                              backgroundColor: Color(0xff1a78f4),
                               padding: const EdgeInsets.fromLTRB(0, 15, 0, 15),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(18.0),
@@ -148,20 +171,26 @@ class _OnboardingState extends State<Onboarding> {
                               )),
 
                           // #1a78f4
-                          onPressed: () async {
-                            var loginType =
-                                await storage.read(key: "login_type");
-                                print(loginType);
-                                print(dotenv.env['LOGIN_REQUIRED']);
-                            if (loginType == dotenv.env['LOGIN_REQUIRED']) {
-                              GoRouter.of(context).pushNamed("login");
-                            } else {
-                              GoRouter.of(context).goNamed("home");
-                            }
-                          },
-                          child: const Text('Continue',
+                          onPressed: isChecked()
+                              ? () async {
+                                  var loginType =
+                                      await storage.read(key: "login_type");
+                                  print(loginType);
+                                  print(dotenv.env['LOGIN_REQUIRED']);
+                                  if (loginType ==
+                                      dotenv.env['LOGIN_REQUIRED']) {
+                                    GoRouter.of(context).pushNamed("login");
+                                  } else {
+                                    GoRouter.of(context).goNamed("home");
+                                  }
+                                }
+                              : null,
+                          child: Text('Continue',
                               style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 16)),
+                                  color:
+                                      isChecked() ? Colors.white : Colors.grey,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16)),
                         )
                       ]),
                 )
@@ -170,6 +199,13 @@ class _OnboardingState extends State<Onboarding> {
       ),
       // #242527
     );
+  }
+
+  bool isChecked() {
+    if (checkbox["a"]! && checkbox["b"]! && checkbox["c"]! && checkbox["d"]!) {
+      return true;
+    }
+    return false;
   }
 
   @override
