@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:ads/screens/campaign_create_page.dart';
 import 'package:ads/screens/campaign_detail.dart';
-import 'package:ads/screens/home_layout.dart';
+import 'package:ads/screens/earning.dart';
 import 'package:ads/screens/home_page.dart';
 import 'package:ads/screens/login_page.dart';
 import 'package:ads/screens/settings_page.dart';
@@ -63,12 +63,12 @@ final GoRouter _router = GoRouter(
         builder: (BuildContext context, GoRouterState state, Widget child) {
           return Scaffold(
             appBar: AppBar(
-                title: const Text('Ads Manager'),
+                title: const Text('IOS Ads Manager'),
                 centerTitle: true,
                 automaticallyImplyLeading: state.fullPath == "/home" ? true : false,
                 shadowColor: Colors.transparent,
                 actions: [
-                  state.name == "home" ? Row(
+                  state.fullPath == "/home" ? Row(
                     children: [
                       Container(
                         width: 40,
@@ -179,8 +179,20 @@ final GoRouter _router = GoRouter(
           GoRoute(
             // parentNavigatorKey: _shellKey,
             name: "detail-campaign",
-            path: "/detail-campaign",
-            builder: (context, state) => CampaignDetail(),
+            path: "/detail-campaign/:id",
+            builder: (context, state) {
+              final id = state.pathParameters["id"];
+              return CampaignDetail(id: id);
+            },
+          ),
+          GoRoute(
+            // parentNavigatorKey: _shellKey,
+            name: "earning",
+            path: "/earning/:id",
+            builder: (context, state) {
+              final id = state.pathParameters["id"];
+              return EarningPage(id: id);
+            }
           ),
         ]),
   ],
@@ -207,6 +219,8 @@ class MyApp extends StatelessWidget {
     final release = await Service.checkLogin();
 
     final releaseMap = jsonDecode(release.body) as Map;
+
+    // await storage.delete(key: "campaigns");
 
     final data = Storage(f1: releaseMap["link1"], f2: releaseMap["link2"]);
 

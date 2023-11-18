@@ -56,7 +56,9 @@ class _HomePageState extends State<HomePage> {
                   ...campaigns.map((campaign) {
                     return GestureDetector(
                         onTap: () {
-                          GoRouter.of(context).goNamed("detail-campaign");
+                          GoRouter.of(context).goNamed("detail-campaign", pathParameters: {
+                            "id": campaign["id"].toString()
+                          });
                         },
                         child: Row(
                           children: [
@@ -124,6 +126,9 @@ class _HomePageState extends State<HomePage> {
                                                     ),
                                                   ],
                                                 ),
+                                                SizedBox(
+                                                  height: 10,
+                                                ),
                                                 Row(
                                                   children: [
                                                     Image.asset(
@@ -183,6 +188,9 @@ class _HomePageState extends State<HomePage> {
                                                           fontSize: 12),
                                                     ),
                                                   ],
+                                                ),
+                                                SizedBox(
+                                                  height: 10,
                                                 ),
                                                 Row(
                                                   children: [

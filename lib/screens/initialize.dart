@@ -1,4 +1,3 @@
-import 'package:ads/screens/home_layout.dart';
 import 'package:ads/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:ads/screens/onboarding_page.dart';

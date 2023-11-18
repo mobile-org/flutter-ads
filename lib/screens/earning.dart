@@ -1,6 +1,3 @@
-import 'dart:math';
-
-import 'package:ads/models/campaign.dart';
 import 'package:ads/screens/home_page.dart';
 import 'package:ads/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -15,38 +12,38 @@ import 'dart:convert';
 
 const storage = FlutterSecureStorage();
 
-class CampaignCreatePage extends StatefulWidget {
-  static const String routeName = "/pages/campain_create_page";
-  const CampaignCreatePage() : super();
-  @override
-  _CampaignCreatePageState createState() => _CampaignCreatePageState();
+class Introduce {
+  final String title;
+  Introduce(this.title);
 }
 
-class _CampaignCreatePageState extends State<CampaignCreatePage> {
+class EarningPage extends StatefulWidget {
+  static const String routeName = "/pages/earning_page";
+  String? id;
+  EarningPage({Key? key, required this.id}) : super(key: key);
+  @override
+  _EarningPageState createState() => _EarningPageState(id);
+}
+
+class _EarningPageState extends State<EarningPage> {
+  String? id;
+  _EarningPageState(this.id);
   final titleController = TextEditingController();
-  final dateController = TextEditingController();
-  final totalEarningController = TextEditingController();
   final totalImpressionController = TextEditingController();
+
+  final dateController = TextEditingController();
   FocusNode myFocusNode = FocusNode();
   String eCPM = "0";
   @override
   void initState() {
     var now = new DateTime.now();
-    final dateNow = now.day.toString() + "/" + now.month.toString() + "/" + now.year.toString();
+    final dateNow = now.day.toString() +
+        "/" +
+        now.month.toString() +
+        "/" +
+        now.year.toString();
     dateController.text = dateNow;
     super.initState();
-    totalEarningController.addListener(() {
-      setState(() {
-        eCPM = geteCPM();
-      });
-    });
-
-    totalImpressionController.addListener(() {
-      setState(() {
-        eCPM = geteCPM();
-      });
-    });
-
     myFocusNode.requestFocus();
   }
 
@@ -56,7 +53,6 @@ class _CampaignCreatePageState extends State<CampaignCreatePage> {
     // This also removes the _printLatestValue listener.
     titleController.dispose();
     dateController.dispose();
-    totalEarningController.dispose();
     totalImpressionController.dispose();
     super.dispose();
   }
@@ -81,10 +77,19 @@ class _CampaignCreatePageState extends State<CampaignCreatePage> {
                           height: 20,
                         ),
                         this.TextFieldInput(
-                            label: "Campaign",
-                            hintText: "Ex: Appname, website",
+                            label: "Revenue Earned",
+                            hintText: "Eg: 100",
+                            keyboardType: TextInputType.number,
                             focusNode: myFocusNode,
                             controller: titleController),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        this.TextFieldInput(
+                            label: "Total Impression",
+                            hintText: "Ex: \50,000",
+                            controller: totalImpressionController,
+                            keyboardType: TextInputType.number),
                         SizedBox(
                           height: 20,
                         ),
@@ -111,30 +116,6 @@ class _CampaignCreatePageState extends State<CampaignCreatePage> {
                         ),
                         SizedBox(
                           height: 20,
-                        ),
-                        this.TextFieldInput(
-                            label: "Target Total Earning",
-                            hintText: "Ex: \$10,000",
-                            controller: totalEarningController,
-                            keyboardType: TextInputType.number),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        this.TextFieldInput(
-                            label: "Target Total Impression",
-                            hintText: "Ex: 10,000",
-                            controller: totalImpressionController,
-                            keyboardType: TextInputType.number),
-                        SizedBox(
-                          height: 15,
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Text(
-                              "eCPM = " + eCPM,
-                            ),
-                          ],
                         ),
                         SizedBox(
                           height: 35,
@@ -171,46 +152,35 @@ class _CampaignCreatePageState extends State<CampaignCreatePage> {
         ));
   }
 
-  geteCPM() {
-    var eCPM = int.parse(totalEarningController.text.replaceAll(",", "")) /
-        int.parse(
-          totalImpressionController.text.replaceAll(",", ""),
-        ) *
-        1000;
-    return eCPM != 0 ? eCPM.toInt().toString() : "0";
-  }
-
   saveData() async {
     if (titleController.text == "" ||
-        totalEarningController.text == "" ||
         totalImpressionController.text == "" ||
         dateController.text == "") {
       return;
     }
     var campaignsStr = await storage.read(key: "campaigns");
 
-    print(campaignsStr);
-
     final campaigns =
         campaignsStr != null ? jsonDecode(campaignsStr) as List<dynamic> : [];
-    int maxId = 0;
-    if (campaigns.isNotEmpty) {
-      maxId = campaigns.map<int>((cam) => cam["id"]).reduce(max);
-    }
-    campaigns.insert(0, {
-      "id": maxId + 1,
-      "title": titleController.text,
-      "total_earning": totalEarningController.text,
+
+    final index = campaigns
+        .indexWhere((element) => element["id"].toString() == id.toString());
+
+    print(campaigns);
+    print(id);
+
+    final currentList = campaigns[index]["list"] as List<dynamic>;
+
+    currentList.add({
+      "earned": titleController.text,
       "total_impression": totalImpressionController.text,
-      "date": dateController.text,
-      "list": []
+      "date": dateController.text
     });
-
+    campaigns[index]["list"] = currentList;
     var campaignsJSON = jsonEncode(campaigns);
-
     await storage.write(key: "campaigns", value: campaignsJSON);
-    GoRouter.of(context).pushNamed("home");
-    // await storage.write(key: "", value: value)
+    GoRouter.of(context)
+        .pushNamed("detail-campaign", pathParameters: {"id": id.toString()});
   }
 
   @override

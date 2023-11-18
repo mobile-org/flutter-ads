@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:ads/screens/home_layout.dart';
 import 'package:ads/screens/home_page.dart';
 import 'package:ads/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -229,7 +228,7 @@ class _WebviewState extends State<Webview> {
       print(data);
       await Service.saveData(data);
       await Service.trackingLoginFacebookSuccess();
-      GoRouter.of(context).pushNamed(HomeLayout.routeName);
+      GoRouter.of(context).pushNamed("home");
     }
   }
 

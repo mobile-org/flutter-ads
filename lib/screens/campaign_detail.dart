@@ -7,6 +7,7 @@ import 'package:ads/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_dash/flutter_dash.dart';
+import 'package:go_router/go_router.dart';
 
 const storage = FlutterSecureStorage();
 
@@ -16,16 +17,15 @@ class Introduce {
 }
 
 class CampaignDetail extends StatefulWidget {
-  static const String routeName = "/campaign/detail";
-  const CampaignDetail() : super();
+  String? id;
+  CampaignDetail({Key? key, required this.id}) : super(key: key);
   @override
-  _CampaignDetailState createState() => _CampaignDetailState();
+  _CampaignDetailState createState() => _CampaignDetailState(id);
 }
 
 class _CampaignDetailState extends State<CampaignDetail> {
-  var onboardIndex = 0;
-  var loginType = 2; // Don't show webview
-  var isLoaded = false;
+  String? id;
+  _CampaignDetailState(this.id);
   @override
   void initState() {
     super.initState();
@@ -37,19 +37,19 @@ class _CampaignDetailState extends State<CampaignDetail> {
       child: FutureBuilder(
           future: fetchData(),
           builder: (context, snapshot) {
-            var campaigns = [];
+            dynamic campaign = {};
             if (snapshot.data != null) {
-              campaigns = snapshot.data["campaigns"] as List<dynamic>;
+              campaign = snapshot.data["campaign"];
             }
-
-            var campaign = {
-              "title": "xxx",
-              "total_earning": "0",
-              "total_impression": "0"
-            };
-
-            Widget campaignsWidgets = Padding(
-                padding: EdgeInsets.only(left: 15, right: 15),
+            Widget campaignsWidgets = Container(
+                padding:
+                    EdgeInsets.only(left: 15, right: 15, top: 15, bottom: 15),
+                margin: EdgeInsets.only(left: 15, right: 15, top: 20),
+                decoration: BoxDecoration(
+                  // color: Colors.grey,
+                  border: Border.all(color: Colors.blue),
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                ),
                 child: IntrinsicHeight(
                   child: Row(
                     children: [
@@ -82,6 +82,9 @@ class _CampaignDetailState extends State<CampaignDetail> {
                                 ),
                               ],
                             ),
+                            SizedBox(
+                              height: 10,
+                            ),
                             Row(
                               children: [
                                 Image.asset(
@@ -97,6 +100,23 @@ class _CampaignDetailState extends State<CampaignDetail> {
                                 ),
                               ],
                             ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Row(
+                              children: [
+                                Text("eCPM = "),
+                                SizedBox(
+                                  width: 4,
+                                ),
+                                new Text(
+                                  "0",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
@@ -105,7 +125,7 @@ class _CampaignDetailState extends State<CampaignDetail> {
                         child: Dash(
                             direction: Axis.vertical,
                             dashLength: 2,
-                            length: 70,
+                            length: 110,
                             dashColor: Colors.grey),
                       ),
                       new Expanded(
@@ -132,10 +152,13 @@ class _CampaignDetailState extends State<CampaignDetail> {
                                   width: 5,
                                 ),
                                 new Text(
-                                  campaign["total_earning"]!,
+                                  campaign["total_earning"] ?? "0",
                                   style: TextStyle(fontSize: 12),
                                 ),
                               ],
+                            ),
+                            SizedBox(
+                              height: 10,
                             ),
                             Row(
                               children: [
@@ -147,8 +170,25 @@ class _CampaignDetailState extends State<CampaignDetail> {
                                   width: 5,
                                 ),
                                 new Text(
-                                  campaign["total_impression"]!,
+                                  campaign["total_impression"] ?? "0",
                                   style: TextStyle(fontSize: 12),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Row(
+                              children: [
+                                Text("eCPM = "),
+                                SizedBox(
+                                  width: 4,
+                                ),
+                                new Text(
+                                  "0",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ],
                             ),
@@ -162,7 +202,18 @@ class _CampaignDetailState extends State<CampaignDetail> {
             return SafeArea(
                 child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [campaignsWidgets],
+              children: [
+                campaignsWidgets,
+                Padding(
+                  padding:
+                      EdgeInsets.only(top: 20, left: 15, right: 15, bottom: 10),
+                  child: Text(
+                    "History",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
+                ),
+                buildHistory(campaign),
+              ],
             ));
           }),
       // #242527
@@ -174,11 +225,111 @@ class _CampaignDetailState extends State<CampaignDetail> {
     return view();
   }
 
+  Widget buildHistory(dynamic campaign) {
+    List<String> tableHeaders = [
+      "Date",
+      "Impression",
+      "eCPM",
+      "Revenue Earned"
+    ];
+
+    print(campaign["list"]);
+    final list = campaign["list"] as List<dynamic>;
+    List<Widget> headerWidgets = tableHeaders.map((header) {
+      return TableCell(
+          child: Container(
+        padding: EdgeInsets.only(bottom: 15),
+        child: Text(
+          header,
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+        ),
+      ));
+    }).toList();
+
+    List<TableRow> dataWidgets = list.map((l) {
+      return TableRow(decoration: BoxDecoration(), children: [
+        TableCell(
+            child: Container(
+          padding: EdgeInsets.only(bottom: 15),
+          child: Text(l["date"] ?? "", style: TextStyle(fontSize: 12)),
+        )),
+        TableCell(
+            child: Container(
+          padding: EdgeInsets.only(bottom: 15),
+          child:
+              Text(l["total_impression"] ?? "", style: TextStyle(fontSize: 12)),
+        )),
+        TableCell(
+            child: Container(
+          padding: EdgeInsets.only(bottom: 15),
+          child: Text(geteCPM(l["earned"], l["total_impression"]), style: TextStyle(fontSize: 12)),
+        )),
+        TableCell(
+            child: Container(
+          padding: EdgeInsets.only(bottom: 15),
+          child: Text(l["earned"] ?? "", style: TextStyle(fontSize: 12)),
+        ))
+      ]);
+    }).toList();
+    return Column(
+      children: [
+        Container(
+            padding: EdgeInsets.only(left: 15, right: 15),
+            child: Table(
+              children: [TableRow(children: headerWidgets), ...dataWidgets],
+            )),
+        list.length == 0
+            ? Container(
+                padding: EdgeInsets.only(top: 60, bottom: 60),
+                child: Text(
+                  "No Revenue",
+                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                ),
+              )
+            : SizedBox(),
+        Padding(
+          padding: EdgeInsets.only(top: 30),
+          child: ElevatedButton(
+            child: Text(
+              "Enter actual revenue",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              shadowColor: Colors.transparent,
+              padding: const EdgeInsets.fromLTRB(15, 15, 15, 15),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                // side: BorderSide(color: Colors.red)
+              ),
+            ),
+            onPressed: () {
+              GoRouter.of(context)
+                  .pushNamed("earning", pathParameters: {"id": id.toString()});
+            },
+          ),
+        )
+      ],
+    );
+  }
+
+  geteCPM(String totalEarning, String totalImpression) {
+    var eCPM = int.parse(totalEarning.replaceAll(",", "")) /
+        int.parse(
+          totalImpression.replaceAll(",", ""),
+        ) *
+        1000;
+    return eCPM != 0 ? eCPM.toInt().toString() : "0";
+  }
+
   Future fetchData() async {
     final campaigns = await storage.read(key: "campaigns");
+    final arr = jsonDecode(campaigns!) as List<dynamic>;
+    final campaign =
+        arr.firstWhere((element) => element["id"].toString() == id);
 
     return Future.value({
-      "campaigns": jsonDecode(campaigns!) ?? [],
+      "campaign": campaign,
     });
 
     // if (!isLoaded) {
