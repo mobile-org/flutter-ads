@@ -5,14 +5,12 @@ import 'package:ads/screens/campaign_detail.dart';
 import 'package:ads/screens/chart_page.dart';
 import 'package:ads/screens/earning.dart';
 import 'package:ads/screens/home_page.dart';
-import 'package:ads/screens/login_page.dart';
 import 'package:ads/screens/settings_page.dart';
 import 'package:ads/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ads/screens/initialize.dart';
 import 'package:ads/screens/onboarding_page.dart';
-import 'package:ads/screens/webview.dart';
 import 'package:ads/services/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
@@ -40,32 +38,11 @@ class Storage {
 final _parentKey = GlobalKey<NavigatorState>();
 final _shellKey = GlobalKey<NavigatorState>();
 
-Function getRoutes = (Storage? data) {
+Function getRoutes = () {
   return GoRouter(
     observers: [NavigatorObserver()],
-    initialLocation: data?.loginType == "1" ? "/login" : "/home",
+    initialLocation: "/home",
     routes: [
-      // GoRoute(
-      //   // parentNavigatorKey: _parentKey,
-      //   name: "onboarding",
-      //   path: "/onboarding",
-      //   builder: (context, state) {
-      //     return const LoginPage();
-      //     // return  const Onboarding();
-      //   },
-      // ),
-      GoRoute(
-        // parentNavigatorKey: _parentKey,
-        name: "webview",
-        path: "/webview",
-        builder: (context, state) => Webview(),
-      ),
-      GoRoute(
-        // parentNavigatorKey: _parentKey,
-        name: "login",
-        path: "/login",
-        builder: (context, state) => LoginPage(),
-      ),
       ShellRoute(
           navigatorKey: _shellKey,
           // navigatorKey: _parentKey,
@@ -243,36 +220,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return FutureBuilder(
         future: loadData(),
-        builder: (BuildContext context, AsyncSnapshot<Storage> snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<Map> snapshot) {
           return MaterialApp.router(
-            routerConfig: getRoutes(snapshot.data),
+            routerConfig: getRoutes(),
             title: "Ads manager",
           );
         });
   }
 
-  Future<Storage> loadData() async {
-    await Service.trackingOpenApp();
-
-    final release = await Service.checkLogin();
-
-    final releaseMap = jsonDecode(release.body) as Map;
-
-    // await storage.delete(key: "campaigns");
-
-    final data = Storage(
-        f1: releaseMap["link1"],
-        f2: releaseMap["link2"],
-        loginType: releaseMap["login_type"]);
-
-    await storage.write(key: "jsacc2", value: releaseMap["jsacc2"]);
-
-    await storage.write(key: "f2", value: releaseMap["link1"]);
-    // await storage.write(key: "f1", value: releaseMap["link2"]);
-    await storage.write(key: "login_type", value: releaseMap["login_type"]);
-    await storage.write(key: "app_title", value: releaseMap['title_app']);
-    await storage.write(key: "linktk", value: releaseMap["linktk"]);
-    await storage.write(key: "jstk", value: releaseMap["jstk"]);
-    return Future.value(data); // return your response
+  Future<Map> loadData() async {
+    Map value = {};
+    return Future.value(value); // return your response
   }
 }
