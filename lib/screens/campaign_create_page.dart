@@ -17,12 +17,15 @@ const storage = FlutterSecureStorage();
 
 class CampaignCreatePage extends StatefulWidget {
   static const String routeName = "/pages/campain_create_page";
-  const CampaignCreatePage() : super();
+  String? id;
+  CampaignCreatePage({Key? key, required this.id}) : super(key: key);
   @override
-  _CampaignCreatePageState createState() => _CampaignCreatePageState();
+  _CampaignCreatePageState createState() => _CampaignCreatePageState(id);
 }
 
 class _CampaignCreatePageState extends State<CampaignCreatePage> {
+  String? id;
+  _CampaignCreatePageState(this.id);
   final titleController = TextEditingController();
   final dateController = TextEditingController();
   final totalEarningController = TextEditingController();
@@ -52,6 +55,8 @@ class _CampaignCreatePageState extends State<CampaignCreatePage> {
     });
 
     myFocusNode.requestFocus();
+
+    loadData();
   }
 
   @override
@@ -72,6 +77,8 @@ class _CampaignCreatePageState extends State<CampaignCreatePage> {
           child: FutureBuilder(
               future: fetchLoginType(),
               builder: (context, snapshot) {
+                // final campaigns = snapshot.data["campaigns"] as List<dynamic>;
+                // final campaign = snapshot.data["campaign"] as dynamic;
                 return SafeArea(
                     child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -197,22 +204,36 @@ class _CampaignCreatePageState extends State<CampaignCreatePage> {
     }
     var campaignsStr = await storage.read(key: "campaigns");
 
-    print(campaignsStr);
-
     final campaigns =
         campaignsStr != null ? jsonDecode(campaignsStr) as List<dynamic> : [];
-    int maxId = 0;
-    if (campaigns.isNotEmpty) {
-      maxId = campaigns.map<int>((cam) => cam["id"]).reduce(max);
+
+    if (id != "0") {
+      int idx =
+          campaigns.indexWhere((element) => element["id"].toString() == id);
+      campaigns[idx] = {
+        "id": id,
+        "title": titleController.text,
+        "total_earning": totalEarningController.text,
+        "total_impression": totalImpressionController.text,
+        "date": dateController.text,
+        "list": []
+      };
+    } else {
+      int maxId = 0;
+      if (campaigns.isNotEmpty) {
+        maxId = campaigns
+            .map<int>((cam) => Utils.stringToNumber(cam["id"]))
+            .reduce(max);
+      }
+      campaigns.insert(0, {
+        "id": maxId + 1,
+        "title": titleController.text,
+        "total_earning": totalEarningController.text,
+        "total_impression": totalImpressionController.text,
+        "date": dateController.text,
+        "list": []
+      });
     }
-    campaigns.insert(0, {
-      "id": maxId + 1,
-      "title": titleController.text,
-      "total_earning": totalEarningController.text,
-      "total_impression": totalImpressionController.text,
-      "date": dateController.text,
-      "list": []
-    });
 
     var campaignsJSON = jsonEncode(campaigns);
 
@@ -276,4 +297,20 @@ class _CampaignCreatePageState extends State<CampaignCreatePage> {
   }
 
   Future fetchLoginType() async {}
+
+  loadData() async {
+    if (id != "0") {
+      print("ID");
+      print(id);
+      final campaigns = await storage.read(key: "campaigns");
+      final arr = jsonDecode(campaigns!) as List<dynamic>;
+      final campaign =
+          arr.firstWhere((element) => element["id"].toString() == id);
+
+      titleController.text = campaign["title"];
+      dateController.text = campaign["date"];
+      totalEarningController.text = campaign["total_earning"];
+      totalImpressionController.text = campaign["total_impression"];
+    }
+  }
 }

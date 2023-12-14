@@ -10,7 +10,7 @@ class Utils {
   static final GlobalKey<NavigatorState> mainAppNav =
       GlobalKey(debugLabel: "_mainAppKey");
 
-  static stringToNumber(String str) {
+  static int stringToNumber(String str) {
     return int.parse(
       str.replaceAll(",", ""),
     );

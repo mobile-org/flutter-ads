@@ -202,10 +202,11 @@ class _OnboardingState extends State<Onboarding> {
   }
 
   bool isChecked() {
-    if (checkbox["a"]! && checkbox["b"]! && checkbox["c"]! && checkbox["d"]!) {
-      return true;
-    }
-    return false;
+    return true;
+    // if (checkbox["a"]! && checkbox["b"]! && checkbox["c"]! && checkbox["d"]!) {
+    //   return true;
+    // }
+    // return false;
   }
 
   @override

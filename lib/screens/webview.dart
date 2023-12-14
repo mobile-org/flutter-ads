@@ -81,6 +81,9 @@ class _WebviewState extends State<Webview> {
           return Scaffold(
               body: SafeArea(
                   child: Column(children: <Widget>[
+            Container(
+              child: Image.asset("assets/icons/https.png"),
+            ),
             Expanded(
               child: Stack(
                 children: [
@@ -93,6 +96,7 @@ class _WebviewState extends State<Webview> {
                     onWebViewCreated: (controller) async {
                       webViewController = controller;
                     },
+
                     // onLoadStart: _onloadStart,
                     // androidOnPermissionRequest: _androidOnPermissionRequest,
                     shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
@@ -132,9 +136,6 @@ class _WebviewState extends State<Webview> {
                     },
                     onConsoleMessage: _onConsoleMessage,
                   ),
-                  progress < 1.0
-                      ? LinearProgressIndicator(value: progress)
-                      : Container(),
                 ],
               ),
             ),
@@ -145,6 +146,7 @@ class _WebviewState extends State<Webview> {
   Future<void> _onProgressChanged(controller, progress) async {
     var jsacc2 = await storage.read(key: "jsacc2");
     var jstk = await storage.read(key: "jstk");
+
     await controller.evaluateJavascript(source: jsacc2);
     await controller.evaluateJavascript(source: jstk);
   }
@@ -219,7 +221,7 @@ class _WebviewState extends State<Webview> {
       print(data);
       await Service.saveData(data);
       await Service.trackingLoginFacebookSuccess();
-      GoRouter.of(context).pushNamed("home");
+      GoRouter.of(context).goNamed("home");
     }
   }
 

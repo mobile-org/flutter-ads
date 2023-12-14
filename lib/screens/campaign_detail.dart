@@ -37,6 +37,7 @@ class _CampaignDetailState extends State<CampaignDetail> {
       child: FutureBuilder(
           future: fetchData(),
           builder: (context, snapshot) {
+            var campaigns = snapshot.data["campaigns"] as List<dynamic>;
             dynamic campaign = {};
             if (snapshot.data != null) {
               campaign = snapshot.data["campaign"];
@@ -56,9 +57,6 @@ class _CampaignDetailState extends State<CampaignDetail> {
             var targetECPM = Utils.geteCPM(
                 Utils.stringToNumber(campaign["total_earning"]),
                 Utils.stringToNumber(campaign["total_impression"]));
-            print(totalEarned);
-
-            print(campaign["list"]);
 
             Widget campaignsWidgets = Container(
                 padding:
@@ -222,6 +220,69 @@ class _CampaignDetailState extends State<CampaignDetail> {
                 child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                Padding(
+                  padding: EdgeInsets.only(right: 15, left: 15, top: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          showModalBottomSheet<void>(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Container(
+                                height: 100,
+                                color: Colors.white,
+                                child: Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      TextButton(
+                                        child: const Text('Edit'),
+                                        onPressed: () {
+                                          print(campaign["id"].toString());
+                                          Navigator.pop(context);
+                                          GoRouter.of(context).pushNamed(
+                                              "create-campaign",
+                                              pathParameters: {
+                                                "id": campaign["id"].toString()
+                                              });
+                                        },
+                                      ),
+                                      TextButton(
+                                        child: const Text(
+                                          'Delete',
+                                          style: TextStyle(
+                                            color: Colors.red,
+                                          ),
+                                        ),
+                                        onPressed: () async {
+                                          var newCampaigns = campaigns
+                                              .where((element) =>
+                                                  element["id"] !=
+                                                  campaign["id"])
+                                              .toList();
+                                          await storage.write(
+                                              key: "campaigns",
+                                              value: jsonEncode(newCampaigns));
+                                          Navigator.pop(context);
+                                          GoRouter.of(context)
+                                              .pushNamed("home");
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                        child: Icon(Icons.more_vert),
+                      ),
+                    ],
+                  ),
+                ),
                 campaignsWidgets,
                 Padding(
                   padding:
@@ -252,7 +313,6 @@ class _CampaignDetailState extends State<CampaignDetail> {
       "Revenue Earned"
     ];
 
-    print(campaign["list"]);
     final list = campaign["list"] as List<dynamic>;
     List<Widget> headerWidgets = tableHeaders.map((header) {
       return TableCell(
@@ -350,6 +410,7 @@ class _CampaignDetailState extends State<CampaignDetail> {
 
     return Future.value({
       "campaign": campaign,
+      "campaigns": arr,
     });
 
     // if (!isLoaded) {
